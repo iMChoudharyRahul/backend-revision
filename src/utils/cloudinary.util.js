@@ -5,10 +5,15 @@ import fs from "fs";
  * Configure cloudinary credentials
  *  */
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: "dq9ezi7ka",
+  api_key: "898434857958383",
+  api_secret: "UbV7BjUzouy_1oGlUyleVm-i2-c",
 });
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
 const uploadOnCloudinary = async (localFilePath) => {
   try {
@@ -24,14 +29,18 @@ const uploadOnCloudinary = async (localFilePath) => {
     console.log("(❁´◡`❁)Check url from cloudinary:📂 ", fileUpload.url);
 
     //Remove the locally saved file
-    // fs.unlinkSync(localFilePath);
+    fs.unlinkSync(localFilePath);
 
     return fileUpload;
   } catch (error) {
     //Remove the locally saved file in case of upload failure
-    // fs.unlinkSync(localFilePath);
+    console.log(
+      "Checking Error while uploading  image to Cloudinary:🚨 ",
+      error
+    );
+    fs.unlinkSync(localFilePath);
     return null;
   }
 };
 
-export { uploadOnCloudinary }
+export { uploadOnCloudinary };

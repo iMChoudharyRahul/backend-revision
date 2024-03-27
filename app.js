@@ -34,9 +34,7 @@ app.get("/", (req, res) => {
  * default api if page not found
  */
 app.all("*", (req, res) => {
-  // req--> fronted --> sign --> name, email, password --> req.methord--> req.body, req.params, req.query
   res.status(404).send("<h3>Page Not Found </h3>");
 });
-
 
 export { app };
