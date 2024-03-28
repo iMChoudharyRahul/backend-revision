@@ -7,7 +7,8 @@ import { User } from "../models/user.model.js";
  * @returns 
  */
 const checkExistingUser = async (email, username) => {
-  return await User.findOne({ $or: [{ email }, { username }] });
+  const response = await User.findOne({ $or: [{ email }, { username }] });
+  return response;
 };
 
 /**
@@ -16,17 +17,21 @@ const checkExistingUser = async (email, username) => {
  * @returns
  */
 const createdUser = async ({ username, fullName, email, password, avatar }) => {
-  let newUser = await User.create({
+   return await User.create({
     username: username.toLowerCase(),
     fullName,
     email,
     password,
     avatar,
   });
-
-  // Fetch the user without the password field
-  const createdUserData = await User.findById(newUser._id).select("-password");
-  return createdUserData;
 };
 
-export { checkExistingUser, createdUser };
+/**
+ * Remove Password from Response while login/signup
+ * @param {*} userId 
+ * @returns 
+ */
+const removePassword = async (userId) => {
+  return await User.findById(userId).select("-password");
+}
+export { checkExistingUser, createdUser, removePassword };

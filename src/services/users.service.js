@@ -1,4 +1,4 @@
-import { checkExistingUser, createdUser } from "../dao/users.dao.js";
+import { checkExistingUser, createdUser, removePassword } from "../dao/users.dao.js";
 import { ApiError } from "../utils/apiError.utils.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.util.js";
 
@@ -11,7 +11,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.util.js";
  * @param {*} avatarLocalPath
  * @returns
  */
-export const userService = async (
+const userService = async (
   username,
   fullName,
   email,
@@ -42,10 +42,38 @@ export const userService = async (
     password,
     avatar: avatarRes.secure_url,
   });
-  
+
   if (!userCreated._id) {
     throw new ApiError(500, "Somthing went wrong creating your account");
   }
 
-  return userCreated;
+  const userData = await removePassword(userCreated._id);
+  return userData;
 };
+
+/**
+ * Login user Service
+ * @param {*} email 
+ * @param {*} username 
+ * @param {*} password 
+ * @returns 
+ */
+const loginService = async (email, username, password) => {
+//get the user according to over recived data 
+ const user = await checkExistingUser(email, username);
+ if (!user){
+  throw new ApiError(404, "User Not found please Check your Email or Username")
+ }
+
+ //check password  is correct or not
+ const isPasswordValid = await user.isPasswordCorrect(password);
+ if(!isPasswordValid){
+  throw new ApiError(401, "Invalid Password");
+ }
+
+ //Remove password before sending response
+   const userData = await removePassword(user._id);
+   return userData;
+}
+
+export {userService, loginService};

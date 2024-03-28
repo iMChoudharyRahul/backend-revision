@@ -1,4 +1,4 @@
-import { userService } from "../services/users.service.js";
+import { loginService, userService } from "../services/users.service.js";
 import { ApiError } from "../utils/apiError.utils.js";
 import { ApiResponse } from "../utils/apiResponse.utils.js";
 import { promiseHandler } from "../utils/asyncHandler.utils.js";
@@ -66,4 +66,34 @@ const registerUser = async (req, res) => {
   }
 };
 
-export { registerUser };
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ */
+const loginUser = async (req, res) => {
+    /**
+     * step-1 --> Get Data From Fronted/postman--> email/username, password
+     * step-2 --> validation add
+     * step-3 --> get the user according to over recived data --> username || email
+     * step-4 --> check the password is correct or not --> isPasswordCorrect methord
+     * step-5 --> set the error according to response  --> if password not match 
+     * step-6 --> remove the password from response 
+     * step-7 --> finaly send the response
+     */
+  try {
+    const { username, email, password } = req.body;
+    //validation check username or email
+    if(!(username || email) && !password){
+        throw new ApiError(400, "username or email and password is required");
+    }
+
+     const userData = await loginService(email, username, password);
+      res.status(200).json(new ApiResponse(200, userData, "User logged In Successfully"));
+  } catch (error) {
+    console.log("Error from login:", error);
+  }
+}
+
+
+export { registerUser, loginUser };
