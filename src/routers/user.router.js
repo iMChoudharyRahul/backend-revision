@@ -16,5 +16,6 @@ userRouter.post(
   registerUser
 );
 
-userRouter.post("/login", loginUser)
+userRouter.post("/login", loginUser);
+userRouter.post("/logout", logoutUser);
 export default userRouter;

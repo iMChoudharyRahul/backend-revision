@@ -1,4 +1,9 @@
-import { checkExistingUser, createdUser, removePassword } from "../dao/users.dao.js";
+import {
+  checkExistingUser,
+  createdUser,
+  removePassword,
+} from "../dao/users.dao.js";
+import { generateTokens } from "../helpers/user.helper.js";
 import { ApiError } from "../utils/apiError.utils.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.util.js";
 
@@ -53,27 +58,33 @@ const userService = async (
 
 /**
  * Login user Service
- * @param {*} email 
- * @param {*} username 
- * @param {*} password 
- * @returns 
+ * @param {*} email
+ * @param {*} username
+ * @param {*} password
+ * @returns
  */
 const loginService = async (email, username, password) => {
-//get the user according to over recived data 
- const user = await checkExistingUser(email, username);
- if (!user){
-  throw new ApiError(404, "User Not found please Check your Email or Username")
- }
+  //get the user according to over recived data
+  const user = await checkExistingUser(email, username);
+  if (!user) {
+    throw new ApiError(
+      404,
+      "User Not found please Check your Email or Username"
+    );
+  }
 
- //check password  is correct or not
- const isPasswordValid = await user.isPasswordCorrect(password);
- if(!isPasswordValid){
-  throw new ApiError(401, "Invalid Password");
- }
+  //check password  is correct or not
+  const isPasswordValid = await user.isPasswordCorrect(password);
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid Password");
+  }
 
- //Remove password before sending response
-   const userData = await removePassword(user._id);
-   return userData;
-}
+  //Generate the access token and refresh token
+  const { accessToken, refreshToken } = generateTokens(user._id);
 
-export {userService, loginService};
+  //Remove password before sending response
+  const userData = await removePassword(user._id);
+  return { userData, accessToken, refreshToken };
+};
+
+export { userService, loginService };

@@ -1,3 +1,4 @@
+import { cookieOptions } from "../constants/constants.js";
 import { loginService, userService } from "../services/users.service.js";
 import { ApiError } from "../utils/apiError.utils.js";
 import { ApiResponse } from "../utils/apiResponse.utils.js";
@@ -67,33 +68,59 @@ const registerUser = async (req, res) => {
 };
 
 /**
- * 
- * @param {*} req 
- * @param {*} res 
+ *
+ * @param {*} req
+ * @param {*} res
  */
 const loginUser = async (req, res) => {
-    /**
-     * step-1 --> Get Data From Fronted/postman--> email/username, password
-     * step-2 --> validation add
-     * step-3 --> get the user according to over recived data --> username || email
-     * step-4 --> check the password is correct or not --> isPasswordCorrect methord
-     * step-5 --> set the error according to response  --> if password not match 
-     * step-6 --> remove the password from response 
-     * step-7 --> finaly send the response
-     */
+  /**
+   * step-1 --> Get Data From Fronted/postman--> email/username, password
+   * step-2 --> validation add
+   * step-3 --> get the user according to over recived data --> username || email
+   * step-4 --> check the password is correct or not --> isPasswordCorrect methord
+   * step-5 --> set the error according to response  --> if password not match
+   * step-6 --> access and refresh token generate and send in json format
+   * step-6 --> remove the password from response
+   * step-7 --> finaly send the response
+   */
   try {
     const { username, email, password } = req.body;
     //validation check username or email
-    if(!(username || email) && !password){
-        throw new ApiError(400, "username or email and password is required");
+    if (!(username || email) && !password) {
+      throw new ApiError(400, "username or email and password is required");
     }
 
-     const userData = await loginService(email, username, password);
-      res.status(200).json(new ApiResponse(200, userData, "User logged In Successfully"));
+    const { userData, accessToken, refreshToken } = await loginService(
+      email,
+      username,
+      password
+    );
+    res
+      .status(200)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            user: userData,
+            accessToken,
+            refreshToken,
+          },
+          "User logged In Successfully"
+        )
+      );
   } catch (error) {
     console.log("Error from login:", error);
   }
-}
+};
 
+const logoutUser = async (req, res) => {
+  /**
+   * step-1 -->
+   */
+  try {
+  } catch (error) {}
+};
 
 export { registerUser, loginUser };
